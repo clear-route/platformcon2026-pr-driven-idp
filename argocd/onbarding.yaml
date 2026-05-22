@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platformcon2026-demo-onboarding-appset
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - pullRequest:
+      github:
+      owner: clear-route
+      repo: platformcon2026-pr-driven-idp
+      appSecretName: constellation-iac
+      labels:
+        - onboarding
+  template:
+    metadata:
+      name: 'platformcon2026-demo-onboarding-app-{{ .branch }}'
+      annotations:
+        # subscribing to the PR comment for preview environments
+        notifications.argoproj.io/subscribe.on-created.github: ""
+
+        # injecting annotations to use for the pull request comment
+        argocd-preview/pr-branch: "{{ .branch }}"
+        argocd-preview/pr-author: "{{ .author }}"
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
+          targetRevision: "{{ .branch }}"
+          path: applications/demo-app/{{ .branch }}/overlays/dev
+          kustomize:
+            commonLabels:
+              cluster: '{{ .metadata.annotations.cluster_name }}'
+              region: '{{ .metadata.annotations.region }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'platformcon2026-demo-onboarding-app-{{ .branch }}'
+      syncPolicy:
+        managedNamespaceMetadata:
+          labels:
+            # attach default deny policy on the namespace
+            deny-default-all: "true"
+        syncOptions:
+          - CreateNamespace=true
+          - SkipDryRunOnMissingResource=true
+        automated:
+          prune: true
+          selfHeal: true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            maxDuration: 3m0s
+            factor: 2

@@ -1,0 +1,115 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app: hiring-tracker
+      allow-ingress-traefik: "true"
+      allow-egress-ephemeral-db: "true"
+    includeSelectors: true
+
+resources:
+  - ../../base
+  - ../../../../kustomize/ephemeral-db
+  - ../../../../kustomize/rds-db-provisioning
+
+configMapGenerator:
+  - name: rds-provisioning-scripts
+    files:
+      - files/db-provisioning.sh
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-5"
+        argocd.argoproj.io/hook: PreSync
+
+  - name: frontend
+    literals:
+      - NEXT_PUBLIC_PASSPORT_URL="https://passport.dev.clearroute.io"
+      - NEXT_PUBLIC_COOKIE_DOMAIN=".dev.clearroute.io"
+      - APP_ENVIRONMENT="development"
+      - DB_SSL_MODE="disable"
+
+  # This configmap holds all the preview environment values based on the application preview PR
+  # the configmaps data will be injected through a kustomize patch in the preview argocd app set
+  # its values are then being used for kustomize replacements
+  - name: preview-values
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-5"
+        argocd.argoproj.io/hook: PreSync
+
+replacements:
+  # lets disable BB monitoring for any ingresses in preview environments
+  - sourceValue: "false"
+    targets:
+      - select:
+          kind: Ingress
+        fieldPaths:
+          - metadata.annotations.[monitoring.blackbox/enabled]
+        options:
+          create: true
+
+  # patch the latest PRs Git SHA as the image tag
+  - source:
+      kind: ConfigMap
+      name: preview-values
+      fieldPath: data.pr-git-sha
+    targets:
+      - select:
+          kind: Deployment
+          name: hiring-tracker
+        fieldPaths:
+          - spec.template.spec.containers.*.image
+        options:
+          delimiter: '-'
+          index: 6
+
+  # set the argocd-app/frontend-hostname annotation for the frontend ingress
+  - source:
+      kind: ConfigMap
+      name: preview-values
+      fieldPath: data.frontend-hostname
+    targets:
+      - select:
+          kind: Ingress
+        fieldPaths:
+          - spec.rules.0.host
+          - spec.tls.0.hosts.0
+          - metadata.annotations.[external-dns.alpha.kubernetes.io/hostname]
+        options:
+          create: true
+
+patches:
+  # point the db-bootstrap Job at the local ephemeral postgres
+  - target:
+      kind: Job
+      name: db-bootstrap
+    patch: |
+      - op: add
+        path: /spec/template/spec/containers/0/envFrom/-
+        value:
+          secretRef:
+              name: postgres
+
+  # inject ephemeral postgres credentials (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
+  # explicit env entries so these always win over any envFrom source (e.g. app secrets)
+  - target:
+      kind: Deployment
+      name: hiring-tracker
+    patch: |
+      - op: add
+        path: /spec/template/spec/containers/0/envFrom/-
+        value:
+          secretRef:
+              name: postgres
+
+  # Secrets: only pull app-specific secrets (no rds_credentials — DB comes from ephemeral-db)
+  - target:
+      kind: ExternalSecret
+      name: secrets
+    patch: |
+      - op: add
+        path: /spec/dataFrom
+        value:
+          - extract:
+              key: constellation/hiring-tracker/preview

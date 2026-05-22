@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platformcon2026-demo-dev-apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
+        revision: dev
+        directories:
+          - path: applications/**/overlays/dev
+  template:
+    metadata:
+      name: 'platformcon2026-demo-dev-app-{{ index .path.segments 1 }}'
+      annotations:
+        argocd-diff-preview/watch-pattern: applications/{{ index .path.segments 1 }}//overlays/dev/.*, applications/{{ index .path.segments 1 }}/base/.*
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
+          targetRevision: dev
+          path: '{{.path.path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'platformcon2026-demo-dev-app-{{ index .path.segments 1 }}'
+      syncPolicy:
+        managedNamespaceMetadata:
+          labels:
+            # attach default deny policy on the namespace
+            deny-default-all: "true"
+        syncOptions:
+          - CreateNamespace=true
+          - SkipDryRunOnMissingResource=true
+        automated:
+          prune: true
+          selfHeal: true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            maxDuration: 3m0s
+            factor: 2

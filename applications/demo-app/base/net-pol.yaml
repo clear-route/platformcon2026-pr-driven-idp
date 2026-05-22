@@ -1,0 +1,17 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-egress-passport
+spec:
+  endpointSelector:
+    matchLabels:
+      k8s:app: hiring-tracker
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:component: passport-backend
+            k8s:io.kubernetes.pod.namespace: app-passport
+      toPorts:
+        - ports:
+            - port: "3001"
+              protocol: TCP

@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hiring-tracker
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/acme-challenge-type: dns01
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-forward-auth-passport@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "" # provided via kustomize overlays patches
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hiring-tracker
+                port:
+                  number: 3000
+  tls:
+    - hosts: [] # provided via kustomize overlays patches
+      secretName: hiring-tracker-cert
