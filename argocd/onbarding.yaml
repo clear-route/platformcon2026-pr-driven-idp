@@ -10,12 +10,12 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
     - pullRequest:
-      github:
-      owner: clear-route
-      repo: platformcon2026-pr-driven-idp
-      appSecretName: constellation-iac
-      labels:
-        - onboarding
+        github:
+          owner: clear-route
+          repo: platformcon2026-pr-driven-idp
+          appSecretName: constellation-iac
+          labels:
+            - onboarding
   template:
     metadata:
       name: 'platformcon2026-demo-onboarding-app-{{ .branch }}'
@@ -31,11 +31,7 @@ spec:
       sources:
         - repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
           targetRevision: "{{ .branch }}"
-          path: applications/demo-app/{{ .branch }}/overlays/dev
-          kustomize:
-            commonLabels:
-              cluster: '{{ .metadata.annotations.cluster_name }}'
-              region: '{{ .metadata.annotations.region }}'
+          path: applications/{{ .branch }}/k8s/overlays/dev
       destination:
         server: https://kubernetes.default.svc
         namespace: 'platformcon2026-demo-onboarding-app-{{ .branch }}'

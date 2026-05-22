@@ -3,29 +3,18 @@ kind: Kustomization
 
 resources:
   - ../../base
-  - ../../../../kustomize/rds-db-provisioning
 
 labels:
   - pairs:
-      app: hiring-tracker
+      app: demo-app
       allow-ingress-traefik: "true"
-      allow-egress-rds: "true"
     includeSelectors: true
 
 images:
-  - name: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/hiring-tracker-frontend-dev
+  - name: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-dev
     newTag: 0.0.0-3938d03
 
 configMapGenerator:
-  - name: rds-provisioning-scripts
-    files:
-      - files/db-provisioning.sh
-    options:
-      annotations:
-        argocd.argoproj.io/sync-wave: "-5"
-        argocd.argoproj.io/hook: PreSync
-        argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-
   - name: frontend
     literals:
       - NEXT_PUBLIC_PASSPORT_URL="https://passport.dev.clearroute.io"
@@ -42,9 +31,7 @@ patches:
         path: /spec/dataFrom
         value:
           - extract:
-              key: constellation/dev/rds_credentials
-          - extract:
-              key: constellation/hiring-tracker/dev
+              key: constellation/demo-app/dev
 
   - target:
       kind: Deployment
@@ -68,11 +55,11 @@ patches:
               key: PGPORT
 
 replacements:
-  - sourceValue: hiring-tracker.dev.clearroute.io
+  - sourceValue: demo-app.dev.clearroute.io
     targets:
       - select:
           kind: Ingress
-          name: hiring-tracker
+          name: demo-app
         fieldPaths:
           - metadata.annotations.[external-dns.alpha.kubernetes.io/hostname]
           - spec.rules.0.host
