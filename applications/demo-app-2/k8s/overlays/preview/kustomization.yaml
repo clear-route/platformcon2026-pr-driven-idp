@@ -47,7 +47,7 @@ replacements:
           create: true
 
   # we cant use kustomize images keyword as that conflicts with how we patch the preview image tag, so we use replacements to patch the preview image repository instead
-  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview:0.0.1"
+  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-2-frontend-preview"
     targets:
       - select:
           kind: Deployment
@@ -68,8 +68,8 @@ replacements:
           # we can target specific images here if we want (https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/replacements/#field-path-format)
           - spec.template.spec.containers.*.image
         options:
-          delimiter: '-'
-          index: 6
+          delimiter: ':'
+          index: 1
 
   # set the argocd-app/frontend-hostname annotation for the frontend ingress
   - source:
