@@ -3,25 +3,14 @@ kind: Kustomization
 
 labels:
   - pairs:
-      app: hiring-tracker
+      app: demo-app
       allow-ingress-traefik: "true"
-      allow-egress-ephemeral-db: "true"
     includeSelectors: true
 
 resources:
   - ../../base
-  - ../../../../kustomize/ephemeral-db
-  - ../../../../kustomize/rds-db-provisioning
 
 configMapGenerator:
-  - name: rds-provisioning-scripts
-    files:
-      - files/db-provisioning.sh
-    options:
-      annotations:
-        argocd.argoproj.io/sync-wave: "-5"
-        argocd.argoproj.io/hook: PreSync
-
   - name: frontend
     literals:
       - NEXT_PUBLIC_PASSPORT_URL="https://passport.dev.clearroute.io"
@@ -57,7 +46,7 @@ replacements:
     targets:
       - select:
           kind: Deployment
-          name: hiring-tracker
+          labelSelector: app=demo-app
         fieldPaths:
           - spec.template.spec.containers.*.image
         options:
@@ -80,29 +69,6 @@ replacements:
           create: true
 
 patches:
-  # point the db-bootstrap Job at the local ephemeral postgres
-  - target:
-      kind: Job
-      name: db-bootstrap
-    patch: |
-      - op: add
-        path: /spec/template/spec/containers/0/envFrom/-
-        value:
-          secretRef:
-              name: postgres
-
-  # inject ephemeral postgres credentials (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
-  # explicit env entries so these always win over any envFrom source (e.g. app secrets)
-  - target:
-      kind: Deployment
-      name: hiring-tracker
-    patch: |
-      - op: add
-        path: /spec/template/spec/containers/0/envFrom/-
-        value:
-          secretRef:
-              name: postgres
-
   # Secrets: only pull app-specific secrets (no rds_credentials — DB comes from ephemeral-db)
   - target:
       kind: ExternalSecret
