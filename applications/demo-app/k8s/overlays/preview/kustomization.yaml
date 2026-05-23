@@ -11,13 +11,6 @@ resources:
   - ../../base
 
 configMapGenerator:
-  - name: frontend
-    literals:
-      - NEXT_PUBLIC_PASSPORT_URL="https://passport.dev.clearroute.io"
-      - NEXT_PUBLIC_COOKIE_DOMAIN=".dev.clearroute.io"
-      - APP_ENVIRONMENT="development"
-      - DB_SSL_MODE="disable"
-
   # This configmap holds all the preview environment values based on the application preview PR
   # the configmaps data will be injected through a kustomize patch in the preview argocd app set
   # its values are then being used for kustomize replacements
@@ -38,6 +31,15 @@ replacements:
         options:
           create: true
 
+  # we cant use kustomize images keyword as that conflicts with how we patch the preview image tag, so we use replacements to patch the preview image repository instead
+  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview:0.0.0"
+    targets:
+      - select:
+          kind: Deployment
+          name: demo-app-frontend
+        fieldPaths:
+          - spec.template.spec.containers.[name=frontend].image
+
   # patch the latest PRs Git SHA as the image tag
   - source:
       kind: ConfigMap
@@ -48,6 +50,7 @@ replacements:
           kind: Deployment
           labelSelector: app=demo-app
         fieldPaths:
+          # we can target specific images here if we want (https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/replacements/#field-path-format)
           - spec.template.spec.containers.*.image
         options:
           delimiter: '-'
@@ -67,15 +70,3 @@ replacements:
           - metadata.annotations.[external-dns.alpha.kubernetes.io/hostname]
         options:
           create: true
-
-patches:
-  # Secrets: only pull app-specific secrets (no rds_credentials — DB comes from ephemeral-db)
-  - target:
-      kind: ExternalSecret
-      name: secrets
-    patch: |
-      - op: add
-        path: /spec/dataFrom
-        value:
-          - extract:
-              key: constellation/hiring-tracker/preview

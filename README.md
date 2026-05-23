@@ -34,3 +34,8 @@
 ## Demo3
 - add preview overlay
 - preview appset in this repo as well
+
+
+# todos
+- get PR comments working https://github.com/clear-route/constellation-iac/blob/main/applications/management/argocd-notifications/notifications.yaml
+- 

@@ -35,7 +35,6 @@ spec:
 
         # injecting annotations to use for the pull request comment
         argocd-preview/frontend-hostname: "{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
-        argocd-preview/backend-hostname: "api.{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
         argocd-preview/namespace: "preview-app-{{ index .path.segments 1 }}-pr-{{.number}}"
         argocd-preview/app-name: "{{ index .path.segments 1 }}"
         argocd-preview/pr-git-sha: "{{ .head_short_sha_7 }}"
@@ -58,8 +57,7 @@ spec:
                   path: /data
                   value:
                     frontend-hostname: "{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
-                    backend-hostname: "api.{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
-                    namespace: "preview-app-{{ index .path.segments 1 }}-pr-{{.number}}"
+                    namespace: "platformcon2026-preview-app-{{ index .path.segments 1 }}-pr-{{.number}}"
                     app-name: "{{ index .path.segments 1 }}"
                     pr-git-sha: "{{ .head_short_sha_7 }}"
                     pr-author: "{{ .author }}"

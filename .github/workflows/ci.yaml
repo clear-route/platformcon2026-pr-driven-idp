@@ -85,7 +85,7 @@ jobs:
         with:
           files: applications/**
           dir_names: true
-          dir_names_max_depth: 4
+          dir_names_max_depth: 2
 
       - name: Build matrix
         id: build-matrix
@@ -99,10 +99,12 @@ jobs:
             # Tag release or manual dispatch: build everything
             dockerfiles=$(find applications -path "*/src/*/Dockerfile" | sort)
           else
-            # PR or push to main: only build what changed
+            # PR or push to main: rebuild all components of any app that had changes
             candidates=""
             for dir in $ALL_CHANGED_DIRS; do
-              [[ -f "$dir/Dockerfile" ]] && candidates="$candidates"$'\n'"$dir/Dockerfile"
+              while IFS= read -r dockerfile; do
+                candidates="$candidates"$'\n'"$dockerfile"
+              done < <(find "$dir" -path "*/src/*/Dockerfile" 2>/dev/null)
             done
             dockerfiles=$(echo "$candidates" | sort -u | grep -v '^$' || true)
           fi
