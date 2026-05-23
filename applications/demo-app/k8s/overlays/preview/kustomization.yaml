@@ -16,9 +16,24 @@ configMapGenerator:
   # its values are then being used for kustomize replacements
   - name: preview-values
     options:
+      disableNameSuffixHash: true
       annotations:
         argocd.argoproj.io/sync-wave: "-5"
         argocd.argoproj.io/hook: PreSync
+
+patches:
+  - target:
+      kind: Deployment
+      name: demo-app-frontend
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env
+        value:
+          - name: BUILD_BRANCH
+            valueFrom:
+              configMapKeyRef:
+                name: preview-values
+                key: pr-branch
 
 replacements:
   # lets disable BB monitoring for any ingresses in preview environments

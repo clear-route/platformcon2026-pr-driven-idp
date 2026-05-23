@@ -38,4 +38,4 @@
 
 # todos
 - get PR comments working https://github.com/clear-route/constellation-iac/blob/main/applications/management/argocd-notifications/notifications.yaml
-- 
+- argocd diff preview

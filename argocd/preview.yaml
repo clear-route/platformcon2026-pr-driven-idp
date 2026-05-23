@@ -59,6 +59,7 @@ spec:
                     frontend-hostname: "{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
                     namespace: "platformcon2026-preview-app-{{ index .path.segments 1 }}-pr-{{.number}}"
                     app-name: "{{ index .path.segments 1 }}"
+                    pr-branch: "{{ .branch }}"
                     pr-git-sha: "{{ .head_short_sha_7 }}"
                     pr-author: "{{ .author }}"
           commonAnnotations:

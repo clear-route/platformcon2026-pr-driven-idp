@@ -1,0 +1,82 @@
+name: Argo CD Diff Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'applications/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: pull-request
+
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          path: main
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/platformcon2026-argocd-diff
+          aws-region: ap-southeast-2
+
+      - uses: aws-actions/aws-secretsmanager-get-secrets@v3
+        with:
+          secret-ids: |
+            constellation/github-app
+          parse-json-secrets: true
+
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          app-id: ${{ env.CONSTELLATION_GITHUB_APP_APP_ID }}
+          private-key: ${{ env.CONSTELLATION_GITHUB_APP_PRIVATE_KEY_PEM }}
+
+      - name: Prepare secrets
+        run: |
+          mkdir -p secrets
+          cat > secrets/secret.yaml <<-EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: private-repo
+            namespace: argocd
+            labels:
+              argocd.argoproj.io/secret-type: repo-creds
+          stringData:
+            url: "https://github.com/${{ github.repository }}"
+            password: ${{ steps.app-token.outputs.token }}
+          EOF
+
+      - name: Generate Diff for Constellation Dev
+        run: |
+          docker run \
+            --network=host \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $(pwd)/main:/base-branch \
+            -v $(pwd)/pull-request:/target-branch \
+            -v $(pwd)/output:/output \
+            -v $(pwd)/secrets:/secrets \
+            -e TARGET_BRANCH=refs/pull/${{ github.event.number }}/merge \
+            -e REPO=${{ github.repository }} \
+            dagandersen/argocd-diff-preview:v0.2.7 \
+              --diff-ignore='[a-z0-9]{5}-[bt]-kube-prometheus-st-[a-z0-9-]+' \
+              --auto-detect-files-changed=true \
+              --watch-if-no-watch-pattern-found=true
+
+      - name: Post diff as comment
+        run: |
+          gh pr comment ${{ github.event.number }} --repo ${{ github.repository }} --body-file output/diff.md --edit-last || \
+          gh pr comment ${{ github.event.number }} --repo ${{ github.repository }} --body-file output/diff.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
