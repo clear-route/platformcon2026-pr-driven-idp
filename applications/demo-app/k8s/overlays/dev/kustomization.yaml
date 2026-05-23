@@ -16,7 +16,7 @@ images:
     newTag: 0.0.0-c684273
 
 replacements:
-  - sourceValue: demo-app-dev.dev.clearroute.io
+  - sourceValue: demo-app-prod.dev.clearroute.io
     targets:
       - select:
           kind: Ingress
