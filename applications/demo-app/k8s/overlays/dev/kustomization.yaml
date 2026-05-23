@@ -14,46 +14,6 @@ images:
   - name: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-dev
     newTag: 0.0.0-dfcfe73
 
-configMapGenerator:
-  - name: frontend
-    literals:
-      - NEXT_PUBLIC_PASSPORT_URL="https://passport.dev.clearroute.io"
-      - NEXT_PUBLIC_COOKIE_DOMAIN=".dev.clearroute.io"
-      - APP_ENVIRONMENT="development"
-      - DB_SSL_MODE="require"
-
-patches:
-  - target:
-      kind: ExternalSecret
-      name: secrets
-    patch: |
-      - op: add
-        path: /spec/dataFrom
-        value:
-          - extract:
-              key: constellation/demo-app/dev
-
-  - target:
-      kind: Deployment
-      name: hiring-tracker
-    patch: |
-      - op: add
-        path: /spec/template/spec/containers/0/env/-
-        value:
-          name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: secrets
-              key: PGHOST
-      - op: add
-        path: /spec/template/spec/containers/0/env/-
-        value:
-          name: DB_PORT
-          valueFrom:
-            secretKeyRef:
-              name: secrets
-              key: PGPORT
-
 replacements:
   - sourceValue: demo-app.dev.clearroute.io
     targets:

@@ -22,10 +22,5 @@ spec:
             value: "0.0.0.0"
           - name: PORT
             value: "3000"
-        envFrom:
-          - configMapRef:
-              name: demo-app-frontend
-          - secretRef:
-              name: demo-app-frontend
         ports:
         - containerPort: 3000
