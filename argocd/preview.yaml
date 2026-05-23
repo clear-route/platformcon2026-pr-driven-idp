@@ -11,25 +11,33 @@ spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
   generators:
-    - pullRequest:
-        github:
-          owner: clear-route
-          repo: platformcon2026-pr-driven-idp
-          appSecretName: constellation-iac
-          labels:
-            - preview
+    - matrix:
+        generators:
+          # for each onboarded application and PR with the label `preview`, create an app
+          - git:
+              repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
+              revision: main
+              directories:
+                - path: applications/**/k8s/overlays/preview
+          - pullRequest:
+              github:
+                owner: clear-route
+                repo: platformcon2026-pr-driven-idp
+                appSecretName: constellation-iac
+                labels:
+                  - preview
   template:
     metadata:
-      name: 'platformcon2026-preview-{{ index .path.segments 2 }}-pr-{{.number}}'
+      name: 'platformcon2026-preview-{{ index .path.segments 1 }}-pr-{{.number}}'
       annotations:
         # subscribing to the PR comment for preview environments
         notifications.argoproj.io/subscribe.on-deployed.github: ""
 
         # injecting annotations to use for the pull request comment
-        argocd-preview/frontend-hostname: "{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
-        argocd-preview/backend-hostname: "api.{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
-        argocd-preview/namespace: "preview-app-{{ index .path.segments 2 }}-{{ index .path.segments 2 }}-pr-{{.number}}"
-        argocd-preview/app-name: "{{ index .path.segments 2 }}"
+        argocd-preview/frontend-hostname: "{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
+        argocd-preview/backend-hostname: "api.{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
+        argocd-preview/namespace: "preview-app-{{ index .path.segments 1 }}-pr-{{.number}}"
+        argocd-preview/app-name: "{{ index .path.segments 1 }}"
         argocd-preview/pr-git-sha: "{{ .head_short_sha_7 }}"
         argocd-preview/pr-author: "{{ .author }}"
     spec:
@@ -37,7 +45,7 @@ spec:
       # multi sources currently not supported with Github Notifications (https://github.com/argoproj/notifications-engine/issues/224)
       source:
         repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
-        targetRevision: dev
+        targetRevision: main
         path: '{{ .path.path }}'
         kustomize:
           patches:
@@ -49,17 +57,17 @@ spec:
                 - op: add
                   path: /data
                   value:
-                    frontend-hostname: "{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
-                    backend-hostname: "api.{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
-                    namespace: "preview-app-{{ index .path.segments 2 }}-{{ index .path.segments 2 }}-pr-{{.number}}"
-                    app-name: "{{ index .path.segments 2 }}"
+                    frontend-hostname: "{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
+                    backend-hostname: "api.{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
+                    namespace: "preview-app-{{ index .path.segments 1 }}-pr-{{.number}}"
+                    app-name: "{{ index .path.segments 1 }}"
                     pr-git-sha: "{{ .head_short_sha_7 }}"
                     pr-author: "{{ .author }}"
           commonAnnotations:
-            link.argocd.argoproj.io/external-link: https://github.com/clear-route/{{ index .path.segments 1 }}/pull/{{.number}}
+            link.argocd.argoproj.io/external-link: https://github.com/clear-route/platformcon2026-pr-driven-idp/pull/{{.number}}
       destination:
         server: https://kubernetes.default.svc
-        namespace: 'platformcon2026-preview-{{ index .path.segments 2 }}-pr-{{.number}}'
+        namespace: 'platformcon2026-preview-{{ index .path.segments 1 }}-pr-{{.number}}'
       syncPolicy:
         managedNamespaceMetadata:
           labels:
