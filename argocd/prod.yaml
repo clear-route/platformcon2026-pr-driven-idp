@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: platformcon2026-dev-apps
+  name: platformcon2026-prod-apps
   namespace: argocd
 spec:
   goTemplate: true
@@ -11,12 +11,12 @@ spec:
         repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
         revision: dev
         directories:
-          - path: applications/**/overlays/dev
+          - path: applications/**/overlays/prod
   template:
     metadata:
-      name: 'platformcon2026-dev-{{ index .path.segments 1 }}'
+      name: 'platformcon2026-prod-{{ index .path.segments 1 }}'
       annotations:
-        argocd-diff-preview/watch-pattern: applications/{{ index .path.segments 1 }}//overlays/dev/.*, applications/{{ index .path.segments 1 }}/base/.*
+        argocd-diff-preview/watch-pattern: applications/{{ index .path.segments 1 }}//overlays/prod/.*, applications/{{ index .path.segments 1 }}/base/.*
     spec:
       project: default
       sources:
@@ -25,7 +25,7 @@ spec:
           path: '{{.path.path}}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: 'platformcon2026-dev-{{ index .path.segments 1 }}'
+        namespace: 'platformcon2026-prod-{{ index .path.segments 1 }}'
       syncPolicy:
         managedNamespaceMetadata:
           labels:
