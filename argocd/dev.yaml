@@ -9,19 +9,19 @@ spec:
   generators:
     - git:
         repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
-        revision: dev
+        revision: main
         directories:
-          - path: applications/**/overlays/dev
+          - path: applications/**/k8s/overlays/dev
   template:
     metadata:
       name: 'platformcon2026-dev-{{ index .path.segments 1 }}'
       annotations:
-        argocd-diff-preview/watch-pattern: applications/{{ index .path.segments 1 }}//overlays/dev/.*, applications/{{ index .path.segments 1 }}/base/.*
+        argocd-diff-preview/watch-pattern: applications/{{ index .path.segments 1 }}/k8s/overlays/dev/.*, applications/{{ index .path.segments 1 }}/k8s/base/.*
     spec:
       project: default
       sources:
         - repoURL: https://github.com/clear-route/platformcon2026-pr-driven-idp.git
-          targetRevision: dev
+          targetRevision: main
           path: '{{.path.path}}'
       destination:
         server: https://kubernetes.default.svc
