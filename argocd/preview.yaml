@@ -3,8 +3,6 @@ kind: ApplicationSet
 metadata:
   name: platformcon2026-preview-appset
   namespace: argocd
-  annotations:
-    argocd-diff-preview/ignore: "true"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
