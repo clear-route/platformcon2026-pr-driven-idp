@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: platformcon2026-demo-onboarding-appset
+  name: platformcon2026-onboarding-appset
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -18,7 +18,7 @@ spec:
             - onboarding
   template:
     metadata:
-      name: 'platformcon2026-demo-onboarding-app-{{ .branch }}'
+      name: 'platformcon2026-onboarding-{{ .branch }}'
       annotations:
         # subscribing to the PR comment for preview environments
         notifications.argoproj.io/subscribe.on-created.github: ""
@@ -34,7 +34,7 @@ spec:
           path: applications/{{ .branch }}/k8s/overlays/dev
       destination:
         server: https://kubernetes.default.svc
-        namespace: 'platformcon2026-demo-onboarding-app-{{ .branch }}'
+        namespace: 'platformcon2026-onboarding-{{ .branch }}'
       syncPolicy:
         managedNamespaceMetadata:
           labels:

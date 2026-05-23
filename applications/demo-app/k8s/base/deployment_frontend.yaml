@@ -16,16 +16,11 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-dev:0.0.0-000000
+        image: clearroute/demo-app-frontend:0.0.0-000000
         env:
           - name: HOSTNAME
             value: "0.0.0.0"
           - name: PORT
             value: "3000"
-        envFrom:
-          - configMapRef:
-              name: demo-app-frontend
-          - secretRef:
-              name: demo-app-frontend
         ports:
         - containerPort: 3000

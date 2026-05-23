@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: platformcon2026-demo-preview-appset
+  name: platformcon2026-preview-appset
   namespace: argocd
   annotations:
     argocd-diff-preview/ignore: "true"
@@ -20,16 +20,16 @@ spec:
             - preview
   template:
     metadata:
-      name: 'platformcon2026-demo-preview-app-{{ index .path.segments 2 }}-pr-{{.number}}'
+      name: 'platformcon2026-preview-{{ index .path.segments 2 }}-pr-{{.number}}'
       annotations:
         # subscribing to the PR comment for preview environments
         notifications.argoproj.io/subscribe.on-deployed.github: ""
 
         # injecting annotations to use for the pull request comment
-        argocd-preview/frontend-hostname: "{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
-        argocd-preview/backend-hostname: "api.{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
-        argocd-preview/namespace: "preview-app-{{ index .path.segments 1 }}-{{ index .path.segments 1 }}-pr-{{.number}}"
-        argocd-preview/app-name: "{{ index .path.segments 1 }}"
+        argocd-preview/frontend-hostname: "{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
+        argocd-preview/backend-hostname: "api.{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
+        argocd-preview/namespace: "preview-app-{{ index .path.segments 2 }}-{{ index .path.segments 2 }}-pr-{{.number}}"
+        argocd-preview/app-name: "{{ index .path.segments 2 }}"
         argocd-preview/pr-git-sha: "{{ .head_short_sha_7 }}"
         argocd-preview/pr-author: "{{ .author }}"
     spec:
@@ -49,17 +49,17 @@ spec:
                 - op: add
                   path: /data
                   value:
-                    frontend-hostname: "{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
-                    backend-hostname: "api.{{ index .path.segments 1 }}-pr-{{.number}}.dev.clearroute.io"
-                    namespace: "preview-app-{{ index .path.segments 1 }}-{{ index .path.segments 1 }}-pr-{{.number}}"
-                    app-name: "{{ index .path.segments 1 }}"
+                    frontend-hostname: "{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
+                    backend-hostname: "api.{{ index .path.segments 2 }}-pr-{{.number}}.dev.clearroute.io"
+                    namespace: "preview-app-{{ index .path.segments 2 }}-{{ index .path.segments 2 }}-pr-{{.number}}"
+                    app-name: "{{ index .path.segments 2 }}"
                     pr-git-sha: "{{ .head_short_sha_7 }}"
                     pr-author: "{{ .author }}"
           commonAnnotations:
             link.argocd.argoproj.io/external-link: https://github.com/clear-route/{{ index .path.segments 1 }}/pull/{{.number}}
       destination:
         server: https://kubernetes.default.svc
-        namespace: 'platformcon2026-demo-preview-app-{{ index .path.segments 1 }}-pr-{{.number}}'
+        namespace: 'platformcon2026-preview-{{ index .path.segments 2 }}-pr-{{.number}}'
       syncPolicy:
         managedNamespaceMetadata:
           labels:

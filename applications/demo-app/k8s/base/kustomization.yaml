@@ -3,6 +3,5 @@ kind: Kustomization
 
 resources:
   - service.yaml
-  - deployment.yaml
+  - deployment_frontend.yaml
   - ingress.yaml
-  - secrets.yaml
