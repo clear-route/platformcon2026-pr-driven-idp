@@ -1,7 +1,6 @@
 terraform {
   required_version = ">= 1.0.0"
 
-  # partially configured using Makefile
   backend "s3" {
     region  = "ap-southeast-2"
     encrypt = "true"
