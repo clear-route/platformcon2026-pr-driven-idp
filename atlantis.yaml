@@ -3,6 +3,5 @@ version: 3
 projects:
   - name: PlatformConDemo-Infra
     dir: infra
-    workflow: infra
     autoplan:
-      when_modified: ["./applications"]
+      when_modified: ["*.tf", "./applications"]

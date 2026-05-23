@@ -35,7 +35,9 @@
 - add preview overlay
 - preview appset in this repo as well
 
+# notes
+- promote to prod, kustomize resource pinning on ref
 
 # todos
 - get PR comments working https://github.com/clear-route/constellation-iac/blob/main/applications/management/argocd-notifications/notifications.yaml
-- argocd diff preview
+- atlantis

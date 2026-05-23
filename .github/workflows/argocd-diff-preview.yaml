@@ -45,7 +45,8 @@ jobs:
       - name: Prepare secrets
         run: |
           mkdir -p secrets
-          cat > secrets/secret.yaml <<-EOF
+
+          cat > secrets/repo-creds.yaml <<-EOF
           apiVersion: v1
           kind: Secret
           metadata:
@@ -56,6 +57,18 @@ jobs:
           stringData:
             url: "https://github.com/${{ github.repository }}"
             password: ${{ steps.app-token.outputs.token }}
+          EOF
+
+          cat > secrets/constellation-iac.yaml <<-EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: constellation-iac
+            namespace: argocd
+          data:
+            githubAppID: $(printf '%s' "$CONSTELLATION_GITHUB_APP_APP_ID" | base64 -w0)
+            githubAppInstallationID: $(printf '%s' "$CONSTELLATION_GITHUB_APP_INSTALLATION_ID" | base64 -w0)
+            githubAppPrivateKey: $(printf '%s' "$CONSTELLATION_GITHUB_APP_PRIVATE_KEY_PEM" | base64 -w0)
           EOF
 
       - name: Generate Diff for Constellation Dev
