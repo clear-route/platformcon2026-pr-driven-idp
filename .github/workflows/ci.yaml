@@ -22,27 +22,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      - name: Generate image tag (latest tag + short SHA)
+      - name: Generate image tag (short SHA)
         id: meta
         shell: bash
         run: |
           set -euo pipefail
-
-          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-            echo "Detected release tag: $VERSION"
-            echo "image-tag=$VERSION" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
-            VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
-          else
-            VERSION="0.0.0"
-          fi
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             SHA="${{ github.event.pull_request.head.sha }}"
@@ -51,8 +36,7 @@ jobs:
           fi
 
           SHORT_SHA=${SHA:0:7}
-          echo "Final image tag: ${VERSION}-${SHORT_SHA}"
-          echo "image-tag=${VERSION}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "image-tag=$SHORT_SHA" >> "$GITHUB_OUTPUT"
 
   discover-apps:
     runs-on: ubuntu-latest

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app-frontend
+  labels:
+    component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: frontend
+  template:
+    metadata:
+      labels:
+        component: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: clearroute/demo-app-frontend:0.0.0-000000
+        env:
+          - name: HOSTNAME
+            value: "0.0.0.0"
+          - name: PORT
+            value: "3000"
+        ports:
+        - containerPort: 3000

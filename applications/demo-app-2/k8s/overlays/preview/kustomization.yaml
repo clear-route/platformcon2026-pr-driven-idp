@@ -3,7 +3,7 @@ kind: Kustomization
 
 labels:
   - pairs:
-      app: demo-app
+      app: demo-app-2
       allow-ingress-traefik: "true"
     includeSelectors: true
 
@@ -47,7 +47,7 @@ replacements:
           create: true
 
   # we cant use kustomize images keyword as that conflicts with how we patch the preview image tag, so we use replacements to patch the preview image repository instead
-  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview"
+  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-2-frontend-preview"
     targets:
       - select:
           kind: Deployment

@@ -39,5 +39,5 @@
 - promote to prod, kustomize resource pinning on ref
 
 # todos
-- get PR comments working https://github.com/clear-route/constellation-iac/blob/main/applications/management/argocd-notifications/notifications.yaml
-- atlantis
+- repo webhooks
+- perhaps change versioning

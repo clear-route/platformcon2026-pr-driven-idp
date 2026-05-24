@@ -4,4 +4,4 @@ projects:
   - name: PlatformConDemo-Infra
     dir: infra
     autoplan:
-      when_modified: ["*.tf", "./applications"]
+      when_modified: ["*.tf", "./applications/**"]
