@@ -12,8 +12,8 @@ labels:
 
 images:
   - name: clearroute/demo-app-frontend
-    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-2-frontend-dev
-    newTag: c684273
+    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-2-frontend-preview
+    newTag: 66ee23e
 
 replacements:
   - sourceValue: demo-app-2-dev.dev.clearroute.io
