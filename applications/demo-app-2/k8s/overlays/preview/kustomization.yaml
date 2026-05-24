@@ -3,7 +3,7 @@ kind: Kustomization
 
 labels:
   - pairs:
-      app: demo-app
+      app: demo-app-2
       allow-ingress-traefik: "true"
     includeSelectors: true
 
