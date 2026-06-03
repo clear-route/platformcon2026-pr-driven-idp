@@ -144,3 +144,4 @@ jobs:
           context: applications/${{ matrix.app }}/src/${{ matrix.component }}
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ matrix.app }}-${{ matrix.component }}-${{ needs.discover-apps.outputs.app-env }}:${{ needs.determine-version.outputs.image-tag }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ matrix.app }}-${{ matrix.component }}-${{ needs.discover-apps.outputs.app-env }}:latest
