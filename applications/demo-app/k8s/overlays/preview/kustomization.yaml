@@ -1,87 +1,87 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
+# apiVersion: kustomize.config.k8s.io/v1beta1
+# kind: Kustomization
 
-labels:
-  - pairs:
-      app: demo-app
-      allow-ingress-traefik: "true"
-    includeSelectors: true
+# labels:
+#   - pairs:
+#       app: demo-app
+#       allow-ingress-traefik: "true"
+#     includeSelectors: true
 
-resources:
-  - ../../base
+# resources:
+#   - ../../base
 
-configMapGenerator:
-  # This configmap holds all the preview environment values based on the application preview PR
-  # the configmaps data will be injected through a kustomize patch in the preview argocd app set
-  # its values are then being used for kustomize replacements
-  - name: preview-values
-    options:
-      disableNameSuffixHash: true
-      annotations:
-        argocd.argoproj.io/sync-wave: "-5"
-        argocd.argoproj.io/hook: PreSync
+# configMapGenerator:
+#   # This configmap holds all the preview environment values based on the application preview PR
+#   # the configmaps data will be injected through a kustomize patch in the preview argocd app set
+#   # its values are then being used for kustomize replacements
+#   - name: preview-values
+#     options:
+#       disableNameSuffixHash: true
+#       annotations:
+#         argocd.argoproj.io/sync-wave: "-5"
+#         argocd.argoproj.io/hook: PreSync
 
-patches:
-  - target:
-      kind: Deployment
-      name: demo-app-frontend
-    patch: |-
-      - op: add
-        path: /spec/template/spec/containers/0/env
-        value:
-          - name: BUILD_BRANCH
-            valueFrom:
-              configMapKeyRef:
-                name: preview-values
-                key: pr-branch
+# patches:
+#   - target:
+#       kind: Deployment
+#       name: demo-app-frontend
+#     patch: |-
+#       - op: add
+#         path: /spec/template/spec/containers/0/env
+#         value:
+#           - name: BUILD_BRANCH
+#             valueFrom:
+#               configMapKeyRef:
+#                 name: preview-values
+#                 key: pr-branch
 
-replacements:
-  # lets disable BB monitoring for any ingresses in preview environments
-  - sourceValue: "false"
-    targets:
-      - select:
-          kind: Ingress
-        fieldPaths:
-          - metadata.annotations.[monitoring.blackbox/enabled]
-        options:
-          create: true
+# replacements:
+#   # lets disable BB monitoring for any ingresses in preview environments
+#   - sourceValue: "false"
+#     targets:
+#       - select:
+#           kind: Ingress
+#         fieldPaths:
+#           - metadata.annotations.[monitoring.blackbox/enabled]
+#         options:
+#           create: true
 
-  # we cant use kustomize images keyword as that conflicts with how we patch the preview image tag, so we use replacements to patch the preview image repository instead
-  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview"
-    targets:
-      - select:
-          kind: Deployment
-          name: demo-app-frontend
-        fieldPaths:
-          - spec.template.spec.containers.[name=frontend].image
+#   # we cant use kustomize images keyword as that conflicts with how we patch the preview image tag, so we use replacements to patch the preview image repository instead
+#   - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview"
+#     targets:
+#       - select:
+#           kind: Deployment
+#           name: demo-app-frontend
+#         fieldPaths:
+#           - spec.template.spec.containers.[name=frontend].image
 
-  # patch the latest PRs Git SHA as the image tag
-  - source:
-      kind: ConfigMap
-      name: preview-values
-      fieldPath: data.pr-git-sha
-    targets:
-      - select:
-          kind: Deployment
-          labelSelector: app=demo-app
-        fieldPaths:
-          # we can target specific images here if we want (https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/replacements/#field-path-format)
-          - spec.template.spec.containers.*.image
-        options:
-          delimiter: ':'
-          index: 1
+#   # patch the latest PRs Git SHA as the image tag
+#   - source:
+#       kind: ConfigMap
+#       name: preview-values
+#       fieldPath: data.pr-git-sha
+#     targets:
+#       - select:
+#           kind: Deployment
+#           labelSelector: app=demo-app
+#         fieldPaths:
+#           # we can target specific images here if we want (https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/replacements/#field-path-format)
+#           - spec.template.spec.containers.*.image
+#         options:
+#           delimiter: ':'
+#           index: 1
 
-  # set the argocd-app/frontend-hostname annotation for the frontend ingress
-  - source:
-      kind: ConfigMap
-      name: preview-values
-      fieldPath: data.frontend-hostname
-    targets:
-      - select:
-          kind: Ingress
-        fieldPaths:
-          - spec.rules.0.host
-          - spec.tls.0.hosts.0
-          - metadata.annotations.[external-dns.alpha.kubernetes.io/hostname]
-        options:
-          create: true
+#   # set the argocd-app/frontend-hostname annotation for the frontend ingress
+#   - source:
+#       kind: ConfigMap
+#       name: preview-values
+#       fieldPath: data.frontend-hostname
+#     targets:
+#       - select:
+#           kind: Ingress
+#         fieldPaths:
+#           - spec.rules.0.host
+#           - spec.tls.0.hosts.0
+#           - metadata.annotations.[external-dns.alpha.kubernetes.io/hostname]
+#         options:
+#           create: true
