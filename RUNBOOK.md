@@ -47,7 +47,34 @@ images:
 7. label this PR `onboarding`, wait for ArgoCD onboarding PR generator pick it up # this can take a while, to trigger immediately, delete the `platformcon2026-onboarding-appset` appset in the ArgoCDUI in the `platformcondemo`
 8. navigate to the ArgoCD demo-app, show the resources and open its URL `https://demo-app-dev.dev.clearroute.io`
 9. revert `newName` back to `-dev`
-10. merge the PR
+10. merge the PER # Onboarding ArgoCD App will be deleted, Demo-app Dev App will be created and should be uop & running once the image has been published on main
 
 # Demo3 - ArgoCD - Preview Environments
+1. `git checkout main && git fetch --all && git pull origin main -r`
+2. `git checkout -b demo-app-change`
+3. Do any dummy change under `applications/demo-app/src/frontend`
+4. commit and push: `git add . && git commit -m "provision demo-app infra" && git push`
+5. Open PR with label `preview`
+6. Switch to ArgoCD UI, a preview app should have been created
+7. navigate to preview URL and show how the branch is shown
+8. u can repeat this multiple times and instruct the audience to do so as well
+9. Merge
+
+You can show how all preview envs are being destroyed after merge
+
 # Demo4 - ArgoCd - Promoting to PROD
+1. `git checkout main && git fetch --all && git pull origin main -r`
+2. `git checkout -b demo-app-promote-to-prod`
+3. copy prod overlay
+
+```
+mkdir -p applications/demo-app/k8s/overlays/prod
+cp -R .templates/demo-app/k8s/overlays/dev/ applications/demo-app/k8s/overlays/prod/
+```
+
+4. replace ref in prod kustomize prod overlay with latest commit on main
+5. replace `newTag` with the short GIT SHA
+6. `git add . && git commit -m "promote to prod" && git push`
+7. show Argocd Diff preview
+8. merge
+9. show argocd prod app and UI
