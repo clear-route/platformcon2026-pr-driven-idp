@@ -21,7 +21,7 @@ Repo local available:
 5. Review TF Plan & comment `atlantis apply -p PlatformConDemo-Infra` # the demo-app infra (IAM, ECR, ..) is now deployed
 6. Copy the example `frontend` source code for `demo-app` to `applications/demo-app/src/frontend`: `cp -R .templates/demo-app/src/* applications/demo-app/src/.`
 7. commit and push: `git add . && git commit -m "demo-app frontend source code" && git push`
-8. switch to Github UI and inspect CI workflow # the demo-app frontend preview image has now been build and published, go to workflow summary and look at the full image tag
+8. switch to Github UI and inspect CI workflow # the demo-app frontend preview image has now been build and published
 9.  Copy k8s manifests for demo-apps `frontend` to `applications/demo-app/k8s`:
 
 ```
@@ -36,14 +36,14 @@ cp -R .templates/demo-app/k8s/overlays/preview/ applications/demo-app/k8s/overla
 ```
 images:
   - name: clearroute/demo-app-frontend
-    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview
-    newTag: <SHA>
+    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview # was demo-app-frontend-dev
 ```
 
 11. commit and push: `git add . && git commit -m "demo-app k8s manifests" && git push`
 12. label this PR `onboarding`, wait for ArgoCD onboarding PR generator pick it up # this can take a while, to trigger immediately, delete the `platformcon2026-onboarding-appset` appset in the ArgoCDUI in the `platformcondemo`
 13. navigate to the ArgoCD demo-app, show the resources and open its URL `https://demo-app-dev.dev.clearroute.io`
-14. merge the PR 
+14. revert `newName` back to `-dev`
+14. merge the PR
 
 
 # Demo2 - ArgoCD - Application Onboarding
