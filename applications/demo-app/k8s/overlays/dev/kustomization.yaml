@@ -12,11 +12,11 @@ labels:
 
 images:
   - name: clearroute/demo-app-frontend
-    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-prod
-    newTag: 1a47ebd
+    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview
+    newTag: latest
 
 replacements:
-  - sourceValue: demo-app-prod.dev.clearroute.io
+  - sourceValue: demo-app-dev.dev.clearroute.io
     targets:
       - select:
           kind: Ingress
