@@ -95,7 +95,7 @@ func main() {
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	log.Printf("hello from demo app listening on port %s", port)
+	log.Printf("hello from demo app change listening on port %s", port)
 	log.Printf("BUILD_BRANCH=%s", buildBranch)
 
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
