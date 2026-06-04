@@ -7,6 +7,7 @@ Repo local available:
 ```
 
 # Demo1 - Atlantis - Infrastructure Provisioning
+> as a developer I want to have the infra required to publish my app image
 1. create branch with name `demo-app`: `git checkout -b demo-app`
 2. create directory in `applications`:
 
