@@ -25,7 +25,7 @@ configMapGenerator:
 patches:
   - target:
       kind: Deployment
-      name: demo-app-frontend
+      name: demo-app
     patch: |-
       - op: add
         path: /spec/template/spec/containers/0/env
@@ -48,13 +48,13 @@ replacements:
           create: true
 
   # we cant use kustomize images keyword as that conflicts with how we patch the preview image tag, so we use replacements to patch the preview image repository instead
-  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview"
+  - sourceValue: "799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-preview"
     targets:
       - select:
           kind: Deployment
-          name: demo-app-frontend
+          name: demo-app
         fieldPaths:
-          - spec.template.spec.containers.[name=frontend].image
+          - spec.template.spec.containers.[name=app].image
 
   # patch the latest PRs Git SHA as the image tag
   - source:

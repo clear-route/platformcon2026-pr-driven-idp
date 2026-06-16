@@ -79,14 +79,14 @@ resource "aws_iam_role_policy_attachment" "argocd_diff" {
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
-  for_each = { for k in local.matrix : "${k.app}-${k.component}-${k.env}" => k }
+  for_each = { for k in local.matrix : "${k.app}-${k.env}" => k }
 
   role       = aws_iam_role.this[each.value.env].name
   policy_arn = aws_iam_policy.this[each.key].arn
 }
 
 resource "aws_iam_policy" "this" {
-  for_each = toset([for k in local.matrix : "${k.app}-${k.component}-${k.env}"])
+  for_each = toset([for k in local.matrix : "${k.app}-${k.env}"])
 
   name = each.key
 

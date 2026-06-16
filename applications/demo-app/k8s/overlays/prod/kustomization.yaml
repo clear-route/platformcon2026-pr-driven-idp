@@ -12,12 +12,12 @@ labels:
     includeSelectors: true
 
 images:
-  - name: clearroute/demo-app-frontend
-    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-dev
+  - name: clearroute/demo-app
+    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-prod
     newTag: latest
 
 replacements:
-  - sourceValue: demo-app-dev.dev.clearroute.io
+  - sourceValue: demo-app-prod.clearroute.io
     targets:
       - select:
           kind: Ingress

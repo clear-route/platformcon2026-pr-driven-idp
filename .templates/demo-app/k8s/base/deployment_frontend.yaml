@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-app-frontend
+  name: demo-app
   labels:
-    component: frontend
+    app: demo-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      component: frontend
+      app: demo-app
   template:
     metadata:
       labels:
-        component: frontend
+        app: demo-app
     spec:
       containers:
-      - name: frontend
-        image: clearroute/demo-app-frontend:0.0.0-000000
+      - name: app
+        image: clearroute/demo-app:0.0.0-000000
         env:
           - name: HOSTNAME
             value: "0.0.0.0"

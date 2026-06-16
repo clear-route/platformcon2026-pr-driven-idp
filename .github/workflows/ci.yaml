@@ -81,14 +81,14 @@ jobs:
 
           if [[ "$GITHUB_REF_TYPE" == "tag" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             # Tag release or manual dispatch: build everything
-            dockerfiles=$(find applications -path "*/src/*/Dockerfile" | sort)
+            dockerfiles=$(find applications -path "*/src/Dockerfile" | sort)
           else
-            # PR or push to main: rebuild all components of any app that had changes
+            # PR or push to main: rebuild any app that had changes
             candidates=""
             for dir in $ALL_CHANGED_DIRS; do
               while IFS= read -r dockerfile; do
                 candidates="$candidates"$'\n'"$dockerfile"
-              done < <(find "$dir" -path "*/src/*/Dockerfile" 2>/dev/null)
+              done < <(find "$dir" -path "*/src/Dockerfile" 2>/dev/null)
             done
             dockerfiles=$(echo "$candidates" | sort -u | grep -v '^$' || true)
           fi
@@ -102,8 +102,7 @@ jobs:
           matrix=$(echo "$dockerfiles" | while IFS= read -r dockerfile; do
             [[ -z "$dockerfile" ]] && continue
             app=$(echo "$dockerfile" | cut -d/ -f2)
-            component=$(echo "$dockerfile" | cut -d/ -f4)
-            echo "{\"app\":\"$app\",\"component\":\"$component\",\"dockerfile\":\"$dockerfile\"}"
+            echo "{\"app\":\"$app\",\"dockerfile\":\"$dockerfile\"}"
           done | jq -sc '{"include": .}')
 
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
@@ -141,7 +140,7 @@ jobs:
           push: true
           platforms: linux/amd64
           file: ${{ matrix.dockerfile }}
-          context: applications/${{ matrix.app }}/src/${{ matrix.component }}
+          context: applications/${{ matrix.app }}/src
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ matrix.app }}-${{ matrix.component }}-${{ needs.discover-apps.outputs.app-env }}:${{ needs.determine-version.outputs.image-tag }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ matrix.app }}-${{ matrix.component }}-${{ needs.discover-apps.outputs.app-env }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ matrix.app }}-${{ needs.discover-apps.outputs.app-env }}:${{ needs.determine-version.outputs.image-tag }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ matrix.app }}-${{ needs.discover-apps.outputs.app-env }}:latest

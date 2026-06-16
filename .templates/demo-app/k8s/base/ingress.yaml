@@ -17,9 +17,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: demo-app-frontend
+                name: demo-app
                 port:
                   number: 3000
   tls:
     - hosts: [] # provided via kustomize overlays patches
-      secretName: demo-app-frontend-cert
+      secretName: demo-app-cert

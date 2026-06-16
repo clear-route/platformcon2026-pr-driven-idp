@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "this" {
-  for_each = toset([for k in local.matrix : "${k.app}-${k.component}-${k.env}"])
+  for_each = toset([for k in local.matrix : "${k.app}-${k.env}"])
 
   name                 = each.key
   image_tag_mutability = "MUTABLE"
@@ -11,7 +11,7 @@ resource "aws_ecr_repository" "this" {
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {
-  for_each = toset([for k in local.matrix : "${k.app}-${k.component}-${k.env}"])
+  for_each = toset([for k in local.matrix : "${k.app}-${k.env}"])
 
   repository = aws_ecr_repository.this[each.key].name
 

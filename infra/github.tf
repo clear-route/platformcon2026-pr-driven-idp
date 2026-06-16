@@ -6,5 +6,5 @@ resource "github_repository_webhook" "this" {
     content_type = "json"
   }
 
-  events = ["push"]
+  events = ["push", "pull_request"]
 }

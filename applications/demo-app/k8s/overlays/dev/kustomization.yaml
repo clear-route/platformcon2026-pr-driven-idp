@@ -11,8 +11,8 @@ labels:
     includeSelectors: true
 
 images:
-  - name: clearroute/demo-app-frontend
-    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-frontend-preview
+  - name: clearroute/demo-app
+    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-dev
     newTag: latest
 
 replacements:
