@@ -23,20 +23,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Generate image tag (short SHA)
+      - name: Generate image tag
         id: meta
         shell: bash
         run: |
           set -euo pipefail
 
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo "image-tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             SHA="${{ github.event.pull_request.head.sha }}"
+            echo "image-tag=${SHA:0:7}" >> "$GITHUB_OUTPUT"
           else
-            SHA="$GITHUB_SHA"
+            echo "image-tag=${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
           fi
-
-          SHORT_SHA=${SHA:0:7}
-          echo "image-tag=$SHORT_SHA" >> "$GITHUB_OUTPUT"
 
   discover-apps:
     runs-on: ubuntu-latest
