@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - https://github.com/clear-route/platformcon2026-pr-driven-idp//applications/demo-app/k8s/base?ref=864fac95a390d1e92766cf6c5ec4ecde04aa93e6
+  - https://github.com/clear-route/platformcon2026-pr-driven-idp//applications/demo-app/k8s/base?ref=v0.5.2
 
 labels:
   - pairs:
