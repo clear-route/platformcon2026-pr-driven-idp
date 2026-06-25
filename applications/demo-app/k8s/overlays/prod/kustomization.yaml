@@ -8,6 +8,7 @@ labels:
   - pairs:
       app: demo-app
       env: prod
+      region: ddd
       allow-ingress-traefik: "true"
     includeSelectors: true
 
