@@ -51,7 +51,7 @@ var page = template.Must(template.New("home").Parse(`<!doctype html>
 </head>
 <body>
   <main>
-    <h1>Hello from demo app</h1>
+    <h1>Hello from demo app!</h1>
     <p>{{ .Message }}</p>
     <p><code>BUILD_BRANCH={{ .BuildBranch }}</code></p>
   </main>
