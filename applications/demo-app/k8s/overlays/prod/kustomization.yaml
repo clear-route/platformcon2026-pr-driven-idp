@@ -2,22 +2,22 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../../base
+  - https://github.com/clear-route/platformcon2026-pr-driven-idp//applications/demo-app/k8s/base?ref=v1.1.0
 
 labels:
   - pairs:
       app: demo-app
-      env: dev
+      env: prod
       allow-ingress-traefik: "true"
     includeSelectors: true
 
 images:
   - name: clearroute/demo-app
-    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-preview
-    newTag: latest
+    newName: 799468650620.dkr.ecr.ap-southeast-2.amazonaws.com/demo-app-prod
+    newTag: v1.1.0
 
 replacements:
-  - sourceValue: demo-app-dev.dev.clearroute.io
+  - sourceValue: demo-app-prod.dev.clearroute.io
     targets:
       - select:
           kind: Ingress
